@@ -15,10 +15,10 @@ class User private constructor(
 ) {
     val userInfo: String
     private val fullName: String
-        get() = listOfNotNull(firstName, lastName).joinToString(" ").capitalize()
+        get() = listOfNotNull(firstName, lastName).joinToString(" ").trim().capitalize()
     private val initials: String
         get() = listOfNotNull(firstName, lastName)?.map {
-            if (it?.isBlank()) "" else
+            if (it?.isBlank()) " " else
             it?.first()?.toUpperCase()
         }?.joinToString(" ")
     private var phone: String? = null
@@ -157,7 +157,7 @@ class User private constructor(
             .filter { it.isNotBlank() }
             .run{
                 when (size) {
-                    1->first() to ""
+                    1->first() to " "
                     2->first() to last()
                     else-> throw IllegalArgumentException("FullName must contain only FirstName and LastName, current split result ${this@fullNameToPair}")
                 }
