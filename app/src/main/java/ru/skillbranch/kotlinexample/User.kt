@@ -87,6 +87,8 @@ class User private constructor(
 
     fun checkPassword(pass: String):Boolean
         {
+            if (pass.isNullOrBlank()) return false
+            else
             return when (meta?.get("auth")) {
             "sms" -> accessCode == pass
             "password"-> encrypt(pass) == passwordHash

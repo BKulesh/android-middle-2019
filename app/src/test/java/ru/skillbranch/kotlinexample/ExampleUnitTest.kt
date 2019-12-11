@@ -115,6 +115,7 @@ class ExampleUnitTest {
 
         val successResult =  holder.loginUser("john_doe@unknown.com", "testPass")
 
+
         Assert.assertEquals(expectedInfo, successResult)
     }
 
