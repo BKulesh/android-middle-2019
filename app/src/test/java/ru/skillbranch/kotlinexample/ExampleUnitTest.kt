@@ -126,7 +126,7 @@ class ExampleUnitTest {
         val user = holder.registerUserByPhone("John", "+7 (917) 971-11-11")
         val expectedInfo = """
             firstName: John
-            lastName:
+            lastName: null
             login: +79179711111
             fullName: John
             initials: J
@@ -136,7 +136,7 @@ class ExampleUnitTest {
         """.trimIndent()
 
         val successResult =  holder.loginUser("+7 (917) 971-11-11", user.accessCode!!)
-
+        println(successResult)
         Assert.assertEquals(expectedInfo, successResult)
     }
 
