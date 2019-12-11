@@ -126,10 +126,10 @@ class ExampleUnitTest {
         val user = holder.registerUserByPhone("John", "+7 (917) 971-11-11")
         val expectedInfo = """
             firstName: John
-            lastName:  
+            lastName:
             login: +79179711111
             fullName: John
-            initials: J  
+            initials: J
             email: null
             phone: +79179711111
             meta: {auth=sms}

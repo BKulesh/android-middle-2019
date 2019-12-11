@@ -18,9 +18,9 @@ class User private constructor(
         get() = listOfNotNull(firstName, lastName).joinToString(" ").trim().capitalize()
     private val initials: String
         get() = listOfNotNull(firstName, lastName)?.map {
-            if (it?.isBlank()) " " else
+            if (it?.isNullOrBlank()) "" else
             it?.first()?.toUpperCase()
-        }?.joinToString(" ")
+        }?.joinToString(" ")?.trim()
     private var phone: String? = null
         set(value) {
             field = value?.replace("[^+\\d]".toRegex(), "")
@@ -157,7 +157,7 @@ class User private constructor(
             .filter { it.isNotBlank() }
             .run{
                 when (size) {
-                    1->first() to " "
+                    1->first() to ""
                     2->first() to last()
                     else-> throw IllegalArgumentException("FullName must contain only FirstName and LastName, current split result ${this@fullNameToPair}")
                 }
