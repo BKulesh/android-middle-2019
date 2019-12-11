@@ -18,6 +18,7 @@ class User private constructor(
         get() = listOfNotNull(firstName, lastName).joinToString(" ").capitalize()
     private val initials: String
         get() = listOfNotNull(firstName, lastName)?.map {
+            if (it?.isBlank()) "" else
             it?.first()?.toUpperCase()
         }?.joinToString(" ")
     private var phone: String? = null
@@ -85,6 +86,11 @@ class User private constructor(
 
     //fun checkPassword(pass: String) = encrypt(pass) == passwordHash
 
+    //public fun getInitials: String
+    //{
+     //   return initials;
+    //}
+
     fun checkPassword(pass: String):Boolean
         {
             if (pass.isNullOrBlank()) return false
@@ -138,7 +144,7 @@ class User private constructor(
             phone: String?=null
         ): User{
             val (firstName:String,lastName:String?)=fullName.fullNameToPair()
-
+            //if (lastName?.isBlank()) lastName=firstName
             return when {
                 !phone.isNullOrBlank()->User(firstName,lastName,phone)
                 !email.isNullOrBlank() && !password.isNullOrBlank() -> User(firstName=firstName,lastName=lastName,email=email,password=password)
