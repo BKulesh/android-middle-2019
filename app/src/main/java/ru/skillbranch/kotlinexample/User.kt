@@ -17,9 +17,9 @@ class User private constructor(
     private val fullName: String
         get() = listOfNotNull(firstName, lastName).joinToString(" ").capitalize()
     private val initials: String
-        get() = listOfNotNull(firstName, lastName).map {
-            it.first().toUpperCase()
-        }.joinToString(" ")
+        get() = listOfNotNull(firstName, lastName)?.map {
+            it?.first()?.toUpperCase()
+        }?.joinToString(" ")
     private var phone: String? = null
         set(value) {
             field = value?.replace("[^+\\d]".toRegex(), "")
