@@ -11,41 +11,41 @@ class User private constructor(
     private val lastName: String?=null,
     email: String?=null,
     rawPhone: String?=null,
-    meta: Map<String,Any>?=null
-){
+    private val meta: Map<String,Any>?=null
+) {
     val userInfo: String
     private val fullName: String
-        get()= listOfNotNull(firstName,lastName).joinToString (" ").capitalize()
+        get() = listOfNotNull(firstName, lastName).joinToString(" ").capitalize()
     private val initials: String
-        get()=listOfNotNull(firstName,lastName).map{it.first().toUpperCase()}.joinToString (" ")
-        //get()=listOfNotNull(firstName?.first()?.toUpperCase(),lastName?.first()?.toUpperCase()).joinToString (" ")
-        //get()="fuck off"
-    private var phone: String?=null
-      set(value){
-          field=value?.replace("[^+\\d]".toRegex(),"")
-      }
-    private var _login:String?=null
-    public var login: String
-        set(value){
-            _login=value?.toLowerCase()
+        get() = listOfNotNull(firstName, lastName).map {
+            it.first().toUpperCase()
+        }.joinToString(" ")
+    private var phone: String? = null
+        set(value) {
+            field = value?.replace("[^+\\d]".toRegex(), "")
         }
-        get()=_login!!
+    private var _login: String? = null
+    public var login: String
+        set(value) {
+            _login = value?.toLowerCase()
+        }
+        get() = _login!!
 
-    private val salt: String by lazy{
-        ByteArray(16).also {SecureRandom().nextBytes(it)}.toString()
+    private val salt: String by lazy {
+        ByteArray(16).also { SecureRandom().nextBytes(it) }.toString()
     }
     private lateinit var passwordHash: String
-    @VisibleForTesting(otherwise=VisibleForTesting.NONE)
-    private lateinit var accessCode: String
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    public lateinit var accessCode: String
 
     constructor(
         firstName: String,
         lastName: String?,
         email: String,
         password: String
-    ): this(firstName,lastName,email=email,meta= mapOf("auth" to "password")){
+    ) : this(firstName, lastName, email = email, meta = mapOf("auth" to "password")) {
         println("Secondary email constructor")
-        passwordHash=encrypt(password)
+        passwordHash = encrypt(password)
     }
 
 
@@ -53,25 +53,25 @@ class User private constructor(
         firstName: String,
         lastName: String?,
         rawPhone: String
-    ): this(firstName,lastName,rawPhone=rawPhone,meta= mapOf("auth" to "sms")){
+    ) : this(firstName, lastName, rawPhone = rawPhone, meta = mapOf("auth" to "sms")) {
         println("Secondory phone constructor")
-        val code:String =generateAccessCode()
-        passwordHash=encrypt(code)
-        accessCode=code
-        sendAccessCodeToUse(rawPhone,code)
+        val code: String = generateAccessCode()
+        passwordHash = encrypt(code)
+        accessCode = code
+        sendAccessCodeToUse(rawPhone, code)
 
     }
 
 
     init {
         println("First init block,primary constructor was called");
-        check(!firstName.isBlank()){"First Name must be is not blank"}
-        check(!email.isNullOrBlank() || !rawPhone.isNullOrBlank()) {"Phone or Email must be is not blank"}
+        check(!firstName.isBlank()) { "First Name must be is not blank" }
+        check(!email.isNullOrBlank() || !rawPhone.isNullOrBlank()) { "Phone or Email must be is not blank" }
 
-        phone=rawPhone
-        login=email ?: phone!!
+        phone = rawPhone
+        login = email ?: phone!!
         println("First init block, primary constructor was called")
-        userInfo="""
+        userInfo = """
             firstName: $firstName
             lastName: $lastName
             login: $login
@@ -83,23 +83,39 @@ class User private constructor(
         """.trimIndent()
     }
 
-    fun checkPassword(pass: String)=encrypt(pass)==passwordHash
+    //fun checkPassword(pass: String) = encrypt(pass) == passwordHash
+
+    fun checkPassword(pass: String):Boolean
+        {
+            return when (meta?.get("auth")) {
+            "sms" -> accessCode == pass
+            "password"-> encrypt(pass) == passwordHash
+            else -> false
+        }
+        }
 
     fun changePassword(oldPass: String, pass: String){
-        if (checkPassword(oldPass))passwordHash=encrypt(pass)
+        if (checkPassword(oldPass)) passwordHash=encrypt(pass)
         else throw IllegalArgumentException("The entered password does not match to entered password")
     }
 
-    private fun encrypt(password: String):String=salt.plus(password).md5()
-
-    private  fun generateAccessCode(): String{
-        var possible="ABCDEFGHIJKLMNOPQRSTUQXYZabcdefghijklmnopqrstuqxyz0123456789"
-        return StringBuilder().apply{
-            (possible.indices).random().also {
-            index->append(possible[index])
-        }
-        }.toString()
+    public  fun renewAccessCode(): String {
+        accessCode=generateAccessCode();
+        return userInfo
     }
+
+    private  fun generateAccessCode(): String {
+        var possible = "ABCDEFGHIJKLMNOPQRSTUQXYZabcdefghijklmnopqrstuqxyz0123456789"
+        return StringBuilder().apply {
+            repeat(6) {
+                (possible.indices).random().also { index ->
+                    append(possible[index])
+                }
+            }
+        } .toString()
+    }
+
+    private fun encrypt(password: String):String=salt.plus(password).md5()
 
     private fun sendAccessCodeToUse(phone: String?,code:String){
         println("Send aceess code $code to phone $phone")
