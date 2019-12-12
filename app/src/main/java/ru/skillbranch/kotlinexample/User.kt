@@ -123,6 +123,7 @@ class User private constructor(
 
     fun markCsvMeta(){
         meta?.put("src","csv")
+        meta?.remove("auth")
         updateUserInfo()
     }
 
