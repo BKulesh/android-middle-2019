@@ -1,6 +1,7 @@
 package ru.skillbranch.kotlinexample
 
 import android.service.autofill.RegexValidator
+import org.jetbrains.annotations.NotNull
 import java.util.regex.Pattern.compile
 
 object UserHolder {
@@ -59,5 +60,40 @@ object UserHolder {
         return map[phone]?.run {renewAccessCode()}
 
         }
+
+    fun importUsers(list: List<String?>): List<User>
+    {
+        var user: User?
+        var fullName: String=""
+        var email: String?=null
+        var phone: String?=null
+        val password: String?="test"
+        var passwordHash: String?=null
+        var securityStr: String?=null
+        var salt: String?=null
+
+        var userList= emptyList<User>()
+        for (j in list.indices) {
+            fullName=""
+            email=null
+            phone=null
+            salt=null
+            val(fullName,email,securityStr,phone)=list[j]!!.split(";");
+            val (salt,passwordHash)=securityStr.split(":")
+            //if (!email.isNullOrBlank())
+                userList+=User.makeUser(fullName,email=email,password=password,phone=phone).also { user->user.salt=salt
+                                                                                                                user.setPasswordHash(passwordHash)
+                                                                                                                user.markCsvMeta()}
+            //else
+             //if (!phone.isNullOrBlank())  userList+=registerUserByPhone(fullName, phone)
+        }
+       // for (j in userList.indices)
+       // {
+       //     userList[j].markCsvMeta()
+       // }
+        return userList
+    }
+
+
 
 }

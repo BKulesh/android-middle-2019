@@ -5,15 +5,16 @@ import java.lang.StringBuilder
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.SecureRandom
+import java.util.regex.Pattern
 
 class User private constructor(
     private val firstName: String,
     private val lastName: String?=null,
-    email: String?=null,
+    private val email: String?=null,
     rawPhone: String?=null,
-    private val meta: Map<String,Any>?=null
+    private val meta: MutableMap<String,Any>?=null
 ) {
-    val userInfo: String
+    var userInfo: String
     private val fullName: String
         get() = listOfNotNull(firstName, lastName).joinToString(" ").trim().capitalize()
     private val initials: String
@@ -32,10 +33,18 @@ class User private constructor(
         }
         get() = _login!!
 
-    private val salt: String by lazy {
-        ByteArray(16).also { SecureRandom().nextBytes(it) }.toString()
-    }
+    private var _salt: String ?= ByteArray(16).also { SecureRandom().nextBytes(it) }.toString()
+
+    public var salt: String
+    /*by lazy {
+        ByteArray(16).also { SecureRandom().nextBytes(it) }.toString() } .also { _salt=salt }*/
+        set(value){
+            _salt=value?.toString()
+        }
+    get()=_salt!!
+
     private lateinit var passwordHash: String
+    fun setPasswordHash(value: String){passwordHash=value}
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     public lateinit var accessCode: String
 
@@ -44,7 +53,7 @@ class User private constructor(
         lastName: String?,
         email: String,
         password: String
-    ) : this(firstName, lastName, email = email, meta = mapOf("auth" to "password")) {
+    ) : this(firstName, lastName, email = email, meta = mutableMapOf("auth" to "password")) {
         println("Secondary email constructor")
         passwordHash = encrypt(password)
     }
@@ -54,13 +63,12 @@ class User private constructor(
         firstName: String,
         lastName: String?,
         rawPhone: String
-    ) : this(firstName, lastName, rawPhone = rawPhone, meta = mapOf("auth" to "sms")) {
+    ) : this(firstName, lastName, rawPhone = rawPhone, meta = mutableMapOf("auth" to "sms")) {
         println("Secondory phone constructor")
         val code: String = generateAccessCode()
         passwordHash = encrypt(code)
         accessCode = code
         sendAccessCodeToUse(rawPhone, code)
-
     }
 
 
@@ -84,15 +92,45 @@ class User private constructor(
         """.trimIndent()
     }
 
-    //fun checkPassword(pass: String) = encrypt(pass) == passwordHash
+    private fun updateUserInfo()
+    {
+        userInfo = """
+            firstName: $firstName
+            lastName: $lastName
+            login: $login
+            fullName: $fullName
+            initials: $initials
+            email: $email
+            phone: $phone
+            meta: $meta
+        """.trimIndent()
+    }
 
-    //public fun getInitials: String
-    //{
-     //   return initials;
-    //}
+    //fun checkPassword(pass: String) = encrypt(pass) == passwordHash
+    private val emailRegex = Pattern.compile(
+        "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                "\\@" +
+                "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                "(" +
+                "\\." +
+                "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                ")+"
+    )
+
+    fun String.isEmail() : Boolean {
+        return emailRegex.matcher(this).matches()
+    }
+
+    fun markCsvMeta(){
+        meta?.put("src","csv")
+        updateUserInfo()
+    }
 
     fun checkPassword(pass: String):Boolean
         {
+            //this.login.isEmail()
+            //email.isEmail()
+
             if (pass.isNullOrBlank()) return false
             else
             return when (meta?.get("auth")) {
@@ -142,6 +180,7 @@ class User private constructor(
             email: String?=null,
             password: String?=null,
             phone: String?=null
+            //John Doe ;JohnDoe@unknow.com;[B@7591083d:c6adb4becdc64e92857e1e2a0fd6af84;;
         ): User{
             val (firstName:String,lastName:String?)=fullName.fullNameToPair()
             //if (lastName?.isBlank()) lastName=firstName
