@@ -46,9 +46,9 @@ object UserHolder {
 
         val alogin: String?
 
-    if (!login?.trim()?.isEmail()) alogin=login?.replace("[^+\\d]".toRegex(), "")
-        else alogin=login
-
+    if (!login?.trim()?.isEmail()) alogin=login?.replace("[^+\\d]".toRegex(), "")?.trim()
+        else alogin=login?.trim()?.toLowerCase()
+    val u=map[alogin]
     return map[alogin.trim()]?.run {
             if (checkPassword(password)) this.userInfo
         else null
@@ -83,14 +83,20 @@ object UserHolder {
             //if (!email.isNullOrBlank())
                 userList+=User.makeUser(fullName,email=email,password=password,phone=phone).also { user->user.salt=salt
                                                                                                                 user.setPasswordHash(passwordHash)
-                                                                                                                user.markCsvMeta()}
-            //else
-             //if (!phone.isNullOrBlank())  userList+=registerUserByPhone(fullName, phone)
+                                                                                                                user.markCsvMeta()
+                                                                                                                map[user.login]=user
+                                                                                                                //println(map.size.toString())
+                                                                                                    }
         }
-       // for (j in userList.indices)
-       // {
-       //     userList[j].markCsvMeta()
-       // }
+        //for (u in map)
+        //{
+        //    println("imp key="+u.key.toString())
+        //    //println("imp value="+u.value.userInfo)
+        //}
+        //val u=map["JohnDoe1@unknow.com".toLowerCase()]
+        //println("imp key="+u?.login)
+        //println("imp value="+u?.userInfo)
+
         return userList
     }
 

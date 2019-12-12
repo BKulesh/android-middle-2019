@@ -181,10 +181,13 @@ class ExampleUnitTest {
         val csv=listOf(" John Doe ;JohnDoe@unknow.com;[B@7591083d:c6adb4becdc64e92857e1e2a0fd6af84;;",
             " John1 Doe1 ;JohnDoe1@unknow.com;[B@7591083d:c6adb4becdc64e92857e1e2a0fd6af84;;")
         val userList=holder.importUsers(csv)
-        for (i in userList.indices){
-            println(userList[i].userInfo)
-        }
-        UserHolder.loginUser("JohnDoe1@unknow.com","[B@7591083d")
+        //for (i in userList.indices){
+        //    println(userList[i].userInfo)
+        //    println(userList[i].salt)
+        //}
+        //UserHolder.loginUser("JohnDoe1@unknow.com","[B@7591083d")
+        //holder.
+        //JohnDoe1@unknow.com
 
     }
 
