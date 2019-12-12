@@ -88,11 +88,11 @@ object UserHolder {
                                                                                                                 //println(map.size.toString())
                                                                                                     }
         }
-        for (u in map)
-        {
-            println("imp key="+u.key.toString())
-            println("imp value="+u.value.userInfo)
-        }
+        //for (u in map)
+        //{
+        //    println("imp key="+u.key.toString())
+        //    println("imp value="+u.value.userInfo)
+        //}
         //val u=map["JohnDoe1@unknow.com".toLowerCase()]
         //println("imp key="+u?.login)
         //println("imp value="+u?.userInfo)

@@ -134,11 +134,16 @@ class User private constructor(
 
             if (pass.isNullOrBlank()) return false
             else
-            return when (meta?.get("auth")) {
-            "sms" -> accessCode == pass
-            "password"-> encrypt(pass) == passwordHash
-            else -> false
-        }
+            //return when (meta?.get("auth")) {
+            //"sms" -> accessCode == pass
+            //"password"-> encrypt(pass) == passwordHash
+            //else -> false
+        //}
+                return when (login.isEmail()) {
+                    true-> encrypt(pass) == passwordHash
+                    false-> accessCode == pass
+                    else -> false
+                }
         }
 
     fun changePassword(oldPass: String, pass: String){
