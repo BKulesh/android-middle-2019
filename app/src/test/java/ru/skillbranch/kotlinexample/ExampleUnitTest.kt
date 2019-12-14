@@ -4,6 +4,7 @@ import org.junit.Assert
 import org.junit.Test
 
 import org.junit.Assert.*
+import ru.skillbranch.kotlinexample.extensions.dropLastUntil
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -188,6 +189,30 @@ class ExampleUnitTest {
         //UserHolder.loginUser("JohnDoe1@unknow.com","[B@7591083d")
         //holder.
         //JohnDoe1@unknow.com
+
+    }
+
+    @Test
+    fun test_lambda(){
+        val holder=UserHolder
+        //val user = holder.registerUser("John Doe", "John_Doe@unknown.com","testPass")
+        holder.dlu {it.userInfo.indexOf("Doe")>0}
+
+    }
+
+    @Test
+    fun test_dropall(){
+        val holder = UserHolder
+        val csv=listOf(" John Doe ;JohnDoe@unknow.com;[B@7591083d:c6adb4becdc64e92857e1e2a0fd6af84;;",
+            " John1 Doe1 ;JohnDoe1@unknow.com;[B@7591083d:c6adb4becdc64e92857e1e2a0fd6af84;;",
+            " John1 Doe2 ;JohnDoe2@unknow.com;[B@7591083d:c6adb4becdc64e92857e1e2a0fd6af84;;",
+            " John1 Doe3 ;JohnDoe3@unknow.com;[B@7591083d:c6adb4becdc64e92857e1e2a0fd6af84;;",
+            " John1 Doe4 ;JohnDoe4@unknow.com;[B@7591083d:c6adb4becdc64e92857e1e2a0fd6af84;;")
+        val userList=holder.importUsers(csv)
+        val newUserList=userList.dropLastUntil { it.login== "JohnDoe2@unknow.com".toLowerCase()}
+        for (i in newUserList.indices){
+            println("i["+i.toString()+"]="+newUserList[i].login)
+        }
 
     }
 

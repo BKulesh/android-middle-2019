@@ -80,6 +80,12 @@ object UserHolder {
             salt=null
             val(fullName,email,securityStr,phone)=list[j]!!.split(";");
             val (salt,passwordHash)=securityStr.split(":")
+
+
+
+
+
+
             //if (!email.isNullOrBlank())
                 userList+=User.makeUser(fullName,email=email,password=password,phone=phone).also { user->user.salt=salt
                                                                                                                 user.setPasswordHash(passwordHash)
@@ -96,10 +102,16 @@ object UserHolder {
         //val u=map["JohnDoe1@unknow.com".toLowerCase()]
         //println("imp key="+u?.login)
         //println("imp value="+u?.userInfo)
-
         return userList
     }
 
+    //fun List.dropLastUntil(predicate: (T) -> Boolean): List{
 
+    //   }
+    fun dlu(ui: (User) -> Boolean) {
+        val u1: User = registerUser("John Doe", "John_Doe@unknown.com","testPass")
+        if (ui(u1)) print("TRUE!") else print("FALSE!")
+        //return u1
+    }
 
 }
